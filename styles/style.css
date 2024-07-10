@@ -1,0 +1,103 @@
+:root {
+    --pokdex-red: #ed1e24;
+    --basic-white: #ffffff;
+}
+
+header {
+    height: 80px;
+    background-color: var(--pokdex-red);
+}
+
+footer {
+    height: 80px;
+    background-color: var(--pokdex-red);
+}
+
+.pokedex-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    justify-content: center;
+}
+
+.pokemon-card {
+    border-radius: 24px;
+    width: 300px;
+    height: 200px;
+    display: flex;
+    padding: 16px;
+    gap:8px;
+    justify-content: space-between;
+}
+
+.card-name {
+    font-size: 24px;
+    font-weight: 700;
+    text-transform: capitalize;
+}
+
+.card-types {
+    display: flex;
+    flex-direction: column;
+}
+
+.card-type {
+    border-radius: 8px;
+    background-color: aqua;
+    padding: 4px;
+}
+
+.detail-overlay {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: rgba(0, 0, 0, 0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.pokemon-details {
+    border-radius: 24px;
+    width: 480px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.detais-baseinfo {
+    display: flex;
+    justify-content: space-between;
+    color: var(--basic-white) ;
+}
+
+.details-image {
+    width: 240px;
+    height: auto;
+}
+
+.details-maininfo {
+    background-color: var(--basic-white);
+    border-radius: 24px;
+}
+
+.maininfo-tabnavigation {
+    display: flex;
+    justify-content: space-evenly;
+}
+
+.maininfo-about table tr td:first-child {
+    width: 150px;
+    font-weight: 700;
+}
+
+.maininfo-about h3 {
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.tabnavigation-tab {
+    cursor: pointer;
+}
