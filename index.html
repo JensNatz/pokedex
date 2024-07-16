@@ -20,33 +20,30 @@
     </div>
     <button id="load-btn">load more</button>
 
-    <div class="detail-overlay">
+    <div id="detail-overlay" class="detail-overlay" onclick="loadPreviousPokemonDetailView()">
+        <img src="./assets/img/arrow-left.png">
         <div id="pokemon-details" class="pokemon-details color-grass">
             <div class="detais-baseinfo">
                 <div class="baseinfo-specs">
-                    <h2 id="baseinfo-name" class="baseinfo-name">Bulbasaur</h2>
+                    <h2 id="baseinfo-name" class="baseinfo-name"></h2>
                     <div id="baseinfo-types" class="baseinfo-types">
-                        <span class="card-type">Poison</span>
-                        <span class="card-type">Poison</span>
                     </div>
                 </div>
                 <div id="baseinfo-id" class="baseinfo-id">
-                    #001
                 </div>
             </div>
-            <img onclick="testfunction()" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/1.png" alt="" class="details-image">
+            <img id="baseinfo-image" class="details-image">
             <div class="details-maininfo">
                 <ul class="maininfo-tabnavigation">
                     <li class="tabnavigation-tab" id="tabnav-about">About</li>
                     <li class="tabnavigation-tab" id="tabnav-basestats">Base Stats</li>
                     <li class="tabnavigation-tab" id="tabnav-evolution">Evolution</li>
-                    <li class="tabnavigation-tab" id="tabnav-moves">Moves</li>
                 </ul>
                 <div id="maininfo-container" class="maininfo-container">
-                   
                 </div>
             </div>
         </div>
+        <img src="./assets/img/arrow-right.png" onclick="loadNextPokemonDetailView()">
     </div>
     <footer>
     </footer>

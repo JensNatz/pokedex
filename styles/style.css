@@ -1,6 +1,8 @@
 :root {
     --pokdex-red: #ed1e24;
     --basic-white: #ffffff;
+    --success-green: rgb(41, 188, 41);
+    --basic-gray: #e0e0e0;
 }
 
 header {
@@ -28,6 +30,7 @@ footer {
     padding: 16px;
     gap:8px;
     justify-content: space-between;
+    cursor: pointer;
 }
 
 .card-name {
@@ -57,7 +60,13 @@ footer {
     display: flex;
     justify-content: center;
     align-items: center;
+    visibility: hidden;
+    gap: 24px;
 }
+
+.detail-overlay-show {
+    visibility: visible;
+} 
 
 .pokemon-details {
     border-radius: 24px;
@@ -100,4 +109,36 @@ footer {
 
 .tabnavigation-tab {
     cursor: pointer;
+}
+
+.progress-container {
+    width: 120px;
+    height: 6px;
+    background-color: var(--basic-gray);
+    border-radius: 5px;
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+.progress-bar {
+    height: 100%;
+    background-color: var(--success-green);
+    border-radius: 5px 0 0 5px;
+}
+
+.maininfo-evochain {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+}
+
+.evochain-image {
+    width: 120px;
+    height: auto;
+}
+
+.evochain-arrow {
+    width: 20px;
+    height: auto;
 }

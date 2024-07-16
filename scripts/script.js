@@ -1,4 +1,5 @@
-let numberOfPokemonToLoad = 2;
+let numberOfPokemonToLoad = 4;
+let maxPokemonId = 151;
 let nextApiUrl = "";
 let currentPokemonDetails = {};
 
@@ -7,7 +8,7 @@ async function renderPokemon(next){
   if(next){
     path = nextApiUrl+".json";
   }else{
-    path = API_BASE_URL+"?limit="+numberOfPokemonToLoad+".json";
+    path = API_BASE_URL+"pokemon?limit="+numberOfPokemonToLoad+".json";
   }
   let currentPokemons =  await loadFromApi(path);
   for (let i = 0; i < currentPokemons.results.length; i++) {
@@ -40,9 +41,11 @@ async function generatePokemonDetailInformation(pokemonData){
     height: pokemonData.height,
     abilities: getPokemonAbilityNames(pokemonData.abilities),
     genderRate: pokemonSpeciesInformation.gender_rate,
+    eggGroup: getPokemonEggGroupNames(pokemonSpeciesInformation.egg_groups),
+    stats: getPokemonStatsInformation(pokemonData.stats),
+    evolutionChainIds : await getPokemonEvolutionChainIds(pokemonData.id)
   };
   currentPokemonDetails = pokemonDetails;
-  console.log(currentPokemonDetails);
 }
 
 async function generatePokemonSpeciesInformation(pokemonId){
@@ -58,6 +61,23 @@ function getPokemonTypeNames(types){
   return arrTypeNames;
 }
 
+function getPokemonStatsInformation(stats){
+  let arrStats =[];
+  for (let i = 0; i < stats.length; i++) {
+    let arrStat = [stats[i].stat.name, stats[i].base_stat];
+    arrStats.push(arrStat); 
+  }
+  return arrStats;
+}
+
+function getPokemonEggGroupNames(eggGroups){
+  let arrEggGroups =[];
+  for (let i = 0; i < eggGroups.length; i++) {
+    arrEggGroups.push(eggGroups[i].name);
+  };
+  return arrEggGroups;
+}
+
 function getPokemonAbilityNames(abilities){
   let arrAbilities =[];
   for (let i = 0; i < abilities.length; i++) {
@@ -66,27 +86,62 @@ function getPokemonAbilityNames(abilities){
   return arrAbilities;
 }
 
-async function renderPokemonDetailView(pokemonId){
-  let pokemonDetailData =  await loadFromApi(API_BASE_URL+"/"+pokemonId);
+async function showPokemonDetailView(pokemonId){
+  await loadPokemonDetailView(pokemonId);
+  renderPokemonDetailView();
+  renderPokemonAboutInformation();
+  showDetailsOverlay();
+}
+
+async function loadPokemonDetailView(pokemonId){
+  let pokemonDetailData =  await loadFromApi(API_BASE_URL+"pokemon/"+pokemonId);
   await generatePokemonDetailInformation(pokemonDetailData);
 }
+
+function renderPokemonDetailView(){
+  document.getElementById('baseinfo-name').innerHTML = currentPokemonDetails.name;
+  document.getElementById('baseinfo-image').src = currentPokemonDetails.image;
+  document.getElementById('baseinfo-id').innerHTML = formatPokemonId(currentPokemonDetails.id);
+  document.getElementById('baseinfo-types').innerHTML = genereateTypesHTML(currentPokemonDetails.types);
+};
+
+async function loadNextPokemonDetailView(){
+  let nextId;
+  if (currentPokemonDetails.id == maxPokemonId){
+    nextId = 1;
+  } else {
+    nextId = currentPokemonDetails.id+1;
+  }
+  await loadPokemonDetailView(nextId);
+  renderPokemonDetailView();
+  renderPokemonAboutInformation();
+}
+
+async function loadPreviousPokemonDetailView(){
+  let previousId;
+  if (currentPokemonDetails.id == 1){
+    previousId = maxPokemonId;
+  } else {
+    previousId = currentPokemonDetails.id-1;
+  }
+  await loadPokemonDetailView(previousId);
+  renderPokemonDetailView();
+  renderPokemonAboutInformation();
+}
+
 
 function loadMorePokemon(){
   renderPokemon(nextApiUrl);
 }
 
-
 function renderPokemonAboutInformation(){
   document.getElementById('maininfo-container').innerHTML = generateDetailsAboutHTML();
 }
 function renderPokemonBasestatsInformation(){
-
+  document.getElementById('maininfo-container').innerHTML = generateDetailsBaseStatsHTML();
 }
 function renderPokemonEvolutionInformation(){
-
-}
-function renderPokemonMovesInformation(){
-
+  document.getElementById('maininfo-container').innerHTML = generateDetailsEvolutionchainHTML();
 }
 
 function registerEventListeners(){
@@ -94,12 +149,33 @@ function registerEventListeners(){
   document.getElementById('tabnav-about').addEventListener("click", renderPokemonAboutInformation);
   document.getElementById('tabnav-basestats').addEventListener("click", renderPokemonBasestatsInformation);
   document.getElementById('tabnav-evolution').addEventListener("click", renderPokemonEvolutionInformation);
-  document.getElementById('tabnav-moves').addEventListener("click", renderPokemonMovesInformation);
+  //document.getElementById('detail-overlay').addEventListener("click", showDetailsOverlay);
+}
+
+function showDetailsOverlay() {
+  document.getElementById('detail-overlay').classList.toggle('detail-overlay-show');
 }
 
 async function testfunction(){
   await renderPokemonDetailView(1);
-  renderPokemonAboutInformation();
+  renderPokemonBasestatsInformation();
+}
+
+async function getPokemonEvolutionChainIds(pokemonId) {
+  let speciesData =  await loadFromApi(API_BASE_URL+"pokemon-species/"+pokemonId);
+  let evolutionChainUrl = speciesData.evolution_chain.url;
+  let evolutionChainData = await loadFromApi(evolutionChainUrl);
+  let evolutionIds = [];
+  function extractIds(evolutionNode) {
+      let urlParts = evolutionNode.species.url.split('/');
+      let id = urlParts[urlParts.length - 2];
+      evolutionIds.push(parseInt(id));
+      if (evolutionNode.evolves_to.length > 0) {
+          evolutionNode.evolves_to.forEach(evolveNode => extractIds(evolveNode));
+      }
+  }
+  extractIds(evolutionChainData.chain);
+  return evolutionIds;
 }
 
 function init(){ 
@@ -108,5 +184,9 @@ function init(){
 }
 window.addEventListener("load", init);
 
-//TO DO - werte für Egg groups auslesen,ist vlt in zeile 33 im Rückgabe JSOn enthalten? wie komme ich sonst ran?
-// Base Stats auslesen und in Funtion generatePokemonDetailInformation Zeite 32 mit ins globale Objekt packen
+//TO DO -
+//für die evolutuon chain URL in zeile 45 eine funktio nschreibemn, die mittels dieser URL einen
+// api request stellt, der dann alle ids der Pokemon aus der Chain in der aufsteigenden Reihenfolge zurück gibt 
+//da alle Bilder mit der ID des Pokemt verbunden sind, kann man dann über die URLS die Bilder anzeigen lassen
+// Suchfunktion?! 
+//load more button

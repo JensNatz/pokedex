@@ -1,5 +1,5 @@
 function generatePokemonCardHTML(pokemonInformation) {
-  return `<div class="pokemon-card color-${pokemonInformation.types[0]}" onclick="renderPokemonDetailView(${pokemonInformation.id})">
+  return `<div class="pokemon-card color-${pokemonInformation.types[0]}" onclick="showPokemonDetailView(${pokemonInformation.id})">
             <div class="card-infoarea">
                 <h2 class="card-name">${pokemonInformation.name} ${formatPokemonId(pokemonInformation.id)}</h2>
                 <div class="card-types">
@@ -47,11 +47,42 @@ function generateDetailsAboutHTML() {
               </tr>
               <tr>
                   <td>Egg Groups</td>
-                  <td>Monster</td>
+                  <td>${currentPokemonDetails.eggGroup}</td>
               </tr>
           </table>                     
       </div>
   `;
+}
+
+function generateDetailsBaseStatsHTML() {
+  let table = `<table>`;
+  for (let i = 0; i < currentPokemonDetails.stats.length; i++) {
+      table += `
+          <tr>
+              <td>${currentPokemonDetails.stats[i][0]}</td>
+              <td>${currentPokemonDetails.stats[i][1]}</td>
+              <td>
+                  <div class="progress-container">
+                      <div class="progress-bar" style="width: ${currentPokemonDetails.stats[i][1]}%;"></div>
+                  </div>
+              </td>
+          </tr>
+      `;
+  }
+  table += `</table>`
+  return table;
+}
+
+function generateDetailsEvolutionchainHTML() {
+  let container = `<div class="maininfo-container">`;
+  for (let i = 0; i < currentPokemonDetails.evolutionChainIds.length; i++) {
+        container += `<img class="evochain-image" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${currentPokemonDetails.evolutionChainIds[i]}.png">`
+        if(i < currentPokemonDetails.evolutionChainIds.length-1){
+          container += `<img src="./assets/img/arrow-right.png" class="evochain-arrow">`;
+        }
+  }
+  container += `</div>`;
+  return container;
 }
 
 function formatPokemonId(pokemonId) {
