@@ -13,15 +13,15 @@
 </head>
 <body>
     <header>
-
+        <input type="text" id="search-input">
     </header>
     <div id="pokedex-container" class="pokedex-container">
 
     </div>
     <button id="load-btn">load more</button>
 
-    <div id="detail-overlay" class="detail-overlay" onclick="loadPreviousPokemonDetailView()">
-        <img src="./assets/img/arrow-left.png">
+    <div id="detail-overlay" class="detail-overlay">
+        <img src="./assets/img/arrow-left.png" onclick="loadNextPokemonDetailView(event, -1)">
         <div id="pokemon-details" class="pokemon-details color-grass">
             <div class="detais-baseinfo">
                 <div class="baseinfo-specs">
@@ -43,7 +43,7 @@
                 </div>
             </div>
         </div>
-        <img src="./assets/img/arrow-right.png" onclick="loadNextPokemonDetailView()">
+        <img src="./assets/img/arrow-right.png" onclick="loadNextPokemonDetailView(event, 1)">
     </div>
     <footer>
     </footer>

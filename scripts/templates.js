@@ -1,5 +1,5 @@
 function generatePokemonCardHTML(pokemonInformation) {
-  return `<div class="pokemon-card color-${pokemonInformation.types[0]}" onclick="showPokemonDetailView(${pokemonInformation.id})">
+  return `<div id="card-${pokemonInformation.name}" class="pokemon-card color-${pokemonInformation.types[0]}" onclick="showPokemonDetailView(${pokemonInformation.id})">
             <div class="card-infoarea">
                 <h2 class="card-name">${pokemonInformation.name} ${formatPokemonId(pokemonInformation.id)}</h2>
                 <div class="card-types">

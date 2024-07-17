@@ -1,23 +1,25 @@
-let numberOfPokemonToLoad = 4;
+let numberOfPokemonToLoad = 3;
 let maxPokemonId = 151;
-let nextApiUrl = "";
+let totalNumberofLoadedPokemon = 0;
 let currentPokemonDetails = {};
 
-async function renderPokemon(next){
-  let path = "";
-  if(next){
-    path = nextApiUrl+".json";
-  }else{
-    path = API_BASE_URL+"pokemon?limit="+numberOfPokemonToLoad+".json";
+async function renderPokemon(){
+  if(totalNumberofLoadedPokemon < maxPokemonId){
+    let limit = numberOfPokemonToLoad;
+    if(totalNumberofLoadedPokemon+numberOfPokemonToLoad > maxPokemonId){limit = maxPokemonId-totalNumberofLoadedPokemon};
+    path = `${API_BASE_URL}pokemon?limit=${limit}&offset=${totalNumberofLoadedPokemon}.json`;
+    console.log(path);
+    let currentPokemons =  await loadFromApi(path);
+    for (let i = 0; i < currentPokemons.results.length; i++) {
+      let pokemonData = await loadFromApi(currentPokemons.results[i].url);
+      let pokemonInformation = generatePokemonInformation(pokemonData);
+      let pokemonCardHTML = generatePokemonCardHTML(pokemonInformation);
+      document.getElementById('pokedex-container').innerHTML += pokemonCardHTML;
+      totalNumberofLoadedPokemon++;
+    }
+  }else {
+    alert("no more to load");
   }
-  let currentPokemons =  await loadFromApi(path);
-  for (let i = 0; i < currentPokemons.results.length; i++) {
-    let pokemonData = await loadFromApi(currentPokemons.results[i].url);
-    let pokemonInformation = generatePokemonInformation(pokemonData);
-    let pokemonCardHTML = generatePokemonCardHTML(pokemonInformation);
-    document.getElementById('pokedex-container').innerHTML += pokemonCardHTML;
-  }
-  nextApiUrl = currentPokemons.next;
 }
 
 function generatePokemonInformation(pokemonData){
@@ -105,33 +107,42 @@ function renderPokemonDetailView(){
   document.getElementById('baseinfo-types').innerHTML = genereateTypesHTML(currentPokemonDetails.types);
 };
 
-async function loadNextPokemonDetailView(){
+async function loadNextPokemonDetailView(event, step){
+  event.stopPropagation();
   let nextId;
-  if (currentPokemonDetails.id == maxPokemonId){
+  if (currentPokemonDetails.id == totalNumberofLoadedPokemon && step > 0){
     nextId = 1;
+  } else if (currentPokemonDetails.id == 1 && step < 0){
+    nextId = totalNumberofLoadedPokemon;
   } else {
-    nextId = currentPokemonDetails.id+1;
+    nextId = currentPokemonDetails.id+step;
   }
   await loadPokemonDetailView(nextId);
   renderPokemonDetailView();
   renderPokemonAboutInformation();
 }
 
-async function loadPreviousPokemonDetailView(){
-  let previousId;
-  if (currentPokemonDetails.id == 1){
-    previousId = maxPokemonId;
-  } else {
-    previousId = currentPokemonDetails.id-1;
-  }
-  await loadPokemonDetailView(previousId);
-  renderPokemonDetailView();
-  renderPokemonAboutInformation();
+function loadMorePokemon(){
+  renderPokemon();
 }
 
-
-function loadMorePokemon(){
-  renderPokemon(nextApiUrl);
+function searchPokemon(){
+  let searchString = document.getElementById('search-input').value;
+  let pokemonCards = document.getElementsByClassName('pokemon-card');
+  if(searchString.length > 2){
+    for (let card of pokemonCards) {
+      if(card.id.substring(5).includes(searchString.toLowerCase())){
+        card.style.display = "flex"
+      }
+      else {
+         card.style.display = "none"
+      }
+    }
+  } else {
+    for (let card of pokemonCards) {
+        card.style.display = "flex"
+    }
+  }
 }
 
 function renderPokemonAboutInformation(){
@@ -149,7 +160,8 @@ function registerEventListeners(){
   document.getElementById('tabnav-about').addEventListener("click", renderPokemonAboutInformation);
   document.getElementById('tabnav-basestats').addEventListener("click", renderPokemonBasestatsInformation);
   document.getElementById('tabnav-evolution').addEventListener("click", renderPokemonEvolutionInformation);
-  //document.getElementById('detail-overlay').addEventListener("click", showDetailsOverlay);
+  document.getElementById('detail-overlay').addEventListener("click", showDetailsOverlay);
+  document.getElementById('search-input').addEventListener("input", searchPokemon); 
 }
 
 function showDetailsOverlay() {
@@ -185,8 +197,6 @@ function init(){
 window.addEventListener("load", init);
 
 //TO DO -
-//für die evolutuon chain URL in zeile 45 eine funktio nschreibemn, die mittels dieser URL einen
-// api request stellt, der dann alle ids der Pokemon aus der Chain in der aufsteigenden Reihenfolge zurück gibt 
-//da alle Bilder mit der ID des Pokemt verbunden sind, kann man dann über die URLS die Bilder anzeigen lassen
+
 // Suchfunktion?! 
 //load more button
