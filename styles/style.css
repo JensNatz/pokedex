@@ -5,6 +5,10 @@
     --basic-gray: #e0e0e0;
 }
 
+.d-none {
+    display: none;
+}
+
 header {
     height: 80px;
     background-color: var(--pokdex-red);
@@ -51,7 +55,7 @@ footer {
 }
 
 .detail-overlay {
-    position: absolute;
+    position: fixed;
     top: 0;
     bottom: 0;
     left: 0;

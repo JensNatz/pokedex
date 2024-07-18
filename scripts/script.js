@@ -1,40 +1,37 @@
-let numberOfPokemonToLoad = 3;
+let numberOfPokemonToLoad = 7;
 let maxPokemonId = 151;
-let totalNumberofLoadedPokemon = 0;
-let currentPokemonDetails = {};
+let currentPokemonId = 0;
+let loadedPokemon = [];
 
 async function renderPokemon(){
-  if(totalNumberofLoadedPokemon < maxPokemonId){
+  if(loadedPokemon.length < maxPokemonId){
+    showSpinnerOverlay();
     let limit = numberOfPokemonToLoad;
-    if(totalNumberofLoadedPokemon+numberOfPokemonToLoad > maxPokemonId){limit = maxPokemonId-totalNumberofLoadedPokemon};
-    path = `${API_BASE_URL}pokemon?limit=${limit}&offset=${totalNumberofLoadedPokemon}.json`;
-    console.log(path);
+    let offset = loadedPokemon.length;
+    if(loadedPokemon.length+numberOfPokemonToLoad > maxPokemonId){limit = maxPokemonId-loadedPokemon.length};
+    path = `${API_BASE_URL}pokemon?limit=${limit}&offset=${loadedPokemon.length}.json`;
     let currentPokemons =  await loadFromApi(path);
     for (let i = 0; i < currentPokemons.results.length; i++) {
       let pokemonData = await loadFromApi(currentPokemons.results[i].url);
-      let pokemonInformation = generatePokemonInformation(pokemonData);
-      let pokemonCardHTML = generatePokemonCardHTML(pokemonInformation);
-      document.getElementById('pokedex-container').innerHTML += pokemonCardHTML;
-      totalNumberofLoadedPokemon++;
+      await generatePokemonInformation(pokemonData);
     }
+    renderPokemonCards(offset);
+    showSpinnerOverlay();
   }else {
     alert("no more to load");
   }
 }
 
-function generatePokemonInformation(pokemonData){
-  let pokemonInformation = {
-    id: pokemonData.id,
-    name: pokemonData.name,
-    image: pokemonData.sprites.other["official-artwork"].front_default,
-    types: getPokemonTypeNames(pokemonData.types)
-  };
-  return pokemonInformation;
+function renderPokemonCards(offset){
+  for (let i = offset; i < loadedPokemon.length; i++) {
+    let pokemonCardHTML = generatePokemonCardHTML(loadedPokemon[i]);
+    document.getElementById('pokedex-container').innerHTML += pokemonCardHTML;
+  }
 }
 
-async function generatePokemonDetailInformation(pokemonData){
+async function generatePokemonInformation(pokemonData){
   let pokemonSpeciesInformation = await(generatePokemonSpeciesInformation(pokemonData.id))
-  let pokemonDetails = {
+  let pokemonInformation = {
     id: pokemonData.id,
     name: pokemonData.name,
     image: pokemonData.sprites.other["official-artwork"].front_default,
@@ -42,12 +39,13 @@ async function generatePokemonDetailInformation(pokemonData){
     weight: pokemonData.weight,
     height: pokemonData.height,
     abilities: getPokemonAbilityNames(pokemonData.abilities),
+    stats: getPokemonStatsInformation(pokemonData.stats),
+    evolutionChainIds : await getPokemonEvolutionChainIds(pokemonData.id),
     genderRate: pokemonSpeciesInformation.gender_rate,
     eggGroup: getPokemonEggGroupNames(pokemonSpeciesInformation.egg_groups),
-    stats: getPokemonStatsInformation(pokemonData.stats),
-    evolutionChainIds : await getPokemonEvolutionChainIds(pokemonData.id)
   };
-  currentPokemonDetails = pokemonDetails;
+  loadedPokemon.push(pokemonInformation);
+  return pokemonInformation;
 }
 
 async function generatePokemonSpeciesInformation(pokemonId){
@@ -88,38 +86,42 @@ function getPokemonAbilityNames(abilities){
   return arrAbilities;
 }
 
-async function showPokemonDetailView(pokemonId){
-  await loadPokemonDetailView(pokemonId);
-  renderPokemonDetailView();
-  renderPokemonAboutInformation();
+function showPokemonDetailView(pokemonId){
+  currentPokemonId = pokemonId;
+  renderPokemonDetailView(currentPokemonId);
+  renderPokemonAboutInformation(currentPokemonId);
+  setDetailViewBackgroundColor();
   showDetailsOverlay();
 }
 
-async function loadPokemonDetailView(pokemonId){
-  let pokemonDetailData =  await loadFromApi(API_BASE_URL+"pokemon/"+pokemonId);
-  await generatePokemonDetailInformation(pokemonDetailData);
+function setDetailViewBackgroundColor(){
+  let background = document.getElementById('pokemon-details-bg');
+  background.className= '';
+  background.classList.add(`color-${loadedPokemon[currentPokemonId-1].types[0]}`)
 }
 
-function renderPokemonDetailView(){
-  document.getElementById('baseinfo-name').innerHTML = currentPokemonDetails.name;
-  document.getElementById('baseinfo-image').src = currentPokemonDetails.image;
-  document.getElementById('baseinfo-id').innerHTML = formatPokemonId(currentPokemonDetails.id);
-  document.getElementById('baseinfo-types').innerHTML = genereateTypesHTML(currentPokemonDetails.types);
+function renderPokemonDetailView(pokemonId){
+  let i = pokemonId-1;
+  document.getElementById('baseinfo-name').innerHTML = loadedPokemon[i].name;
+  document.getElementById('baseinfo-image').src = loadedPokemon[i].image;
+  document.getElementById('baseinfo-id').innerHTML = formatPokemonId(pokemonId);
+  document.getElementById('baseinfo-types').innerHTML = genereateTypesHTML(loadedPokemon[i].types);
 };
 
 async function loadNextPokemonDetailView(event, step){
   event.stopPropagation();
   let nextId;
-  if (currentPokemonDetails.id == totalNumberofLoadedPokemon && step > 0){
+  if (currentPokemonId == loadedPokemon.length && step > 0){
     nextId = 1;
-  } else if (currentPokemonDetails.id == 1 && step < 0){
-    nextId = totalNumberofLoadedPokemon;
+  } else if (currentPokemonId == 1 && step < 0){
+    nextId = loadedPokemon.length;
   } else {
-    nextId = currentPokemonDetails.id+step;
+    nextId = currentPokemonId+step;
   }
-  await loadPokemonDetailView(nextId);
-  renderPokemonDetailView();
+  currentPokemonId = nextId;
+  renderPokemonDetailView(nextId);
   renderPokemonAboutInformation();
+  setDetailViewBackgroundColor();
 }
 
 function loadMorePokemon(){
@@ -146,13 +148,16 @@ function searchPokemon(){
 }
 
 function renderPokemonAboutInformation(){
-  document.getElementById('maininfo-container').innerHTML = generateDetailsAboutHTML();
+  let i = currentPokemonId-1;
+  document.getElementById('maininfo-container').innerHTML = generateDetailsAboutHTML(i);
 }
 function renderPokemonBasestatsInformation(){
-  document.getElementById('maininfo-container').innerHTML = generateDetailsBaseStatsHTML();
+  let i = currentPokemonId-1;
+  document.getElementById('maininfo-container').innerHTML = generateDetailsBaseStatsHTML(i);
 }
 function renderPokemonEvolutionInformation(){
-  document.getElementById('maininfo-container').innerHTML = generateDetailsEvolutionchainHTML();
+  let i = currentPokemonId-1;
+  document.getElementById('maininfo-container').innerHTML = generateDetailsEvolutionchainHTML(i);
 }
 
 function registerEventListeners(){
@@ -165,12 +170,11 @@ function registerEventListeners(){
 }
 
 function showDetailsOverlay() {
-  document.getElementById('detail-overlay').classList.toggle('detail-overlay-show');
+  document.getElementById('detail-overlay').classList.add('detail-overlay-show');
 }
 
-async function testfunction(){
-  await renderPokemonDetailView(1);
-  renderPokemonBasestatsInformation();
+function showSpinnerOverlay() {
+  document.getElementById('spinner-overlay').classList.toggle('d-none');
 }
 
 async function getPokemonEvolutionChainIds(pokemonId) {
@@ -197,6 +201,5 @@ function init(){
 window.addEventListener("load", init);
 
 //TO DO -
-
-// Suchfunktion?! 
-//load more button
+// Meldung wenn alle pokemon geladen sind oder button deaktivieren 
+// Style der Balken in 3 Farben, rot, grün gelb

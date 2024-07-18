@@ -22,48 +22,48 @@ function genereateAbilitiesHTML(abilities) {
   return abilities.join(', ');
 };
 
-function generateDetailsAboutHTML() {
+function generateDetailsAboutHTML(i) {
   return `
       <div class="maininfo-about">
           <table>
               <tr>
                   <td>Height</td>
-                  <td>${convertHeight(currentPokemonDetails.height)}</td>
+                  <td>${convertHeight(loadedPokemon[i].height)}</td>
               </tr>
               <tr>
                   <td>Weight</td>
-                  <td>${convertWeight(currentPokemonDetails.weight)}</td>
+                  <td>${convertWeight(loadedPokemon[i].weight)}</td>
               </tr>
               <tr>
                   <td>Abilities</td>
-                  <td>${genereateAbilitiesHTML(currentPokemonDetails.abilities)}</td>
+                  <td>${genereateAbilitiesHTML(loadedPokemon[i].abilities)}</td>
               </tr>
           </table>
           <h3>Breeding</h3>
           <table>
               <tr>
                   <td>Gender</td>
-                  <td>${convertGenderRateDescription(currentPokemonDetails.genderRate)}</td>
+                  <td>${convertGenderRateDescription(loadedPokemon[i].genderRate)}</td>
               </tr>
               <tr>
                   <td>Egg Groups</td>
-                  <td>${currentPokemonDetails.eggGroup}</td>
+                  <td>${loadedPokemon[i].eggGroup}</td>
               </tr>
           </table>                     
       </div>
   `;
 }
 
-function generateDetailsBaseStatsHTML() {
+function generateDetailsBaseStatsHTML(i) {
   let table = `<table>`;
-  for (let i = 0; i < currentPokemonDetails.stats.length; i++) {
+  for (let k = 0; k < loadedPokemon[i].stats.length; k++) {
       table += `
           <tr>
-              <td>${currentPokemonDetails.stats[i][0]}</td>
-              <td>${currentPokemonDetails.stats[i][1]}</td>
+              <td>${loadedPokemon[i].stats[k][0]}</td>
+              <td>${loadedPokemon[i].stats[k][1]}</td>
               <td>
                   <div class="progress-container">
-                      <div class="progress-bar" style="width: ${currentPokemonDetails.stats[i][1]}%;"></div>
+                      <div class="progress-bar" style="width: ${loadedPokemon[i].stats[k][1]}%;"></div>
                   </div>
               </td>
           </tr>
@@ -73,11 +73,11 @@ function generateDetailsBaseStatsHTML() {
   return table;
 }
 
-function generateDetailsEvolutionchainHTML() {
+function generateDetailsEvolutionchainHTML(i) {
   let container = `<div class="maininfo-container">`;
-  for (let i = 0; i < currentPokemonDetails.evolutionChainIds.length; i++) {
-        container += `<img class="evochain-image" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${currentPokemonDetails.evolutionChainIds[i]}.png">`
-        if(i < currentPokemonDetails.evolutionChainIds.length-1){
+  for (let k = 0; k < loadedPokemon[i].evolutionChainIds.length; k++) {
+        container += `<img class="evochain-image" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${loadedPokemon[i].evolutionChainIds[k]}.png">`
+        if(k < loadedPokemon[i].evolutionChainIds.length-1){
           container += `<img src="./assets/img/arrow-right.png" class="evochain-arrow">`;
         }
   }
