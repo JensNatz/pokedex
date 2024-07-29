@@ -1,8 +1,18 @@
 :root {
-    --pokdex-red: #ed1e24;
+    --pokdex-red: #FFB3B3;
     --basic-white: #ffffff;
-    --success-green: rgb(41, 188, 41);
+    --success-green: #A7D992;
     --basic-gray: #e0e0e0;
+    --basic-dark: #141F2B;
+    --basic-interactive: #6E79D9;
+    --basic-interactive-25: #6e79d948;
+    --basic-interactive-50:#6e79d97c;
+}
+
+body {
+    font-family: 'Inter';
+    font-size: 16px;
+    color:  var(--basic-white);
 }
 
 .d-none {
@@ -10,8 +20,17 @@
 }
 
 header {
-    height: 80px;
+    display: flex;
+}
+
+.header-bar {
     background-color: var(--pokdex-red);
+    padding-right: 24px;
+    height: 68px;
+    flex-basis: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: right;
 }
 
 footer {
@@ -30,11 +49,24 @@ footer {
     border-radius: 24px;
     width: 300px;
     height: 200px;
-    display: flex;
-    padding: 16px;
-    gap:8px;
-    justify-content: space-between;
+    padding: 24px;
     cursor: pointer;
+    background-repeat: no-repeat;
+    background-size: 60%;
+    background-position-x: right;
+    background-position-y: bottom;
+}
+
+.pokemon-card:hover, .load-btn:hover  {
+    transition: transform .2s;
+    transform: scale(1.025);
+}
+
+.card-titlearea {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin:  0 0 16px 0;
 }
 
 .card-name {
@@ -50,9 +82,18 @@ footer {
 
 .card-type {
     border-radius: 8px;
-    background-color: aqua;
+    background-color: rgba(255, 255, 255, 0.25);
+    width: 80px;
     padding: 4px;
+    margin-bottom: 4px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-transform: capitalize;
+    font-size: 12px;
+    font-weight: 700;
 }
+
 
 .detail-overlay {
     position: fixed;
@@ -72,47 +113,110 @@ footer {
     visibility: visible;
 } 
 
-.pokemon-details {
-    border-radius: 24px;
-    width: 480px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+.overlay-arrow {
+    width: 40px;
+    height: auto;
 }
 
-.detais-baseinfo {
+.overlay-close {
+    width: 40px;
+    height: 40px;
+}
+
+.pokemon-details {
+    border-radius: 24px;
+    width: 580px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: var(--basic-dark);
+}
+
+.details-baseinfo {
     display: flex;
     justify-content: space-between;
     color: var(--basic-white) ;
+    padding: 24px 24px 0 24px;
+    width: calc(100% - 48px);
+}
+
+.baseinfo-types {
+    display: flex;
+    gap: 8px;
+    margin: 16px 0 0 0;
+} 
+
+.baseinfo-id {
+    margin: 8px 0 0 0;
 }
 
 .details-image {
-    width: 240px;
-    height: auto;
+    width: auto;
+    height: 240px;
 }
 
 .details-maininfo {
     background-color: var(--basic-white);
+    height: 320px;
     border-radius: 24px;
+    padding: 24px;
+    width: calc(100% - 48px);
 }
 
 .maininfo-tabnavigation {
     display: flex;
-    justify-content: space-evenly;
+    gap: 24px;
+    margin: 16px 0 32px 0;
+    font-weight: 600;
 }
 
-.maininfo-about table tr td:first-child {
-    width: 150px;
+.tabnavigation-tab {
+    border-bottom: 2px solid var(--basic-interactive-25);
+    padding-bottom: 8px;
+}
+
+.tabnavigation-tab:hover {
+    border-bottom: 2px solid var(--basic-interactive-50);
+}
+
+.tab-active {
+    border-bottom: 2px solid var(--basic-interactive);
+}
+
+.about-flavortext {
+    margin: 0 0 24px 0;
+    padding: 16px;
+    border-radius: 8px;
+    box-shadow: 1px 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+table tr{
+    line-height: 24px;
+}
+
+.about-table-caps {
+    text-transform: capitalize;
+}
+
+.about-table tr td:first-child {
+    width: 120px;
     font-weight: 700;
 }
 
 .maininfo-about h3 {
     font-size: 20px;
     font-weight: 700;
+    margin: 16px 0 8px 0;
 }
 
 .tabnavigation-tab {
     cursor: pointer;
+}
+
+.stats-table tr td {
+    text-transform: capitalize;
+    vertical-align: middle;
+    padding-right: 40px;
 }
 
 .progress-container {
@@ -121,20 +225,27 @@ footer {
     background-color: var(--basic-gray);
     border-radius: 5px;
     overflow: hidden;
-    margin-bottom: 20px;
 }
 
 .progress-bar {
     height: 100%;
-    background-color: var(--success-green);
     border-radius: 5px 0 0 5px;
 }
 
-.maininfo-evochain {
+.bar-color-green {
+    background-color: var(--success-green);
+}
+
+.bar-color-red {
+    background-color: var(--pokdex-red);
+}
+
+.evochain-entry {
     display: flex;
-    justify-content: center;
     align-items: center;
-    gap: 16px;
+    justify-content: center;
+    gap: 32px;
+    margin: 0 32px 0 0;
 }
 
 .evochain-image {
@@ -142,7 +253,31 @@ footer {
     height: auto;
 }
 
+.evochain-level {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
 .evochain-arrow {
-    width: 20px;
+    width: 40px;
     height: auto;
 }
+
+.loadbtn-container {
+    display: flex;
+    justify-content: center;
+}
+
+.load-btn {
+    background-color: var(--basic-interactive);
+    border: none;
+    width: 180px;    
+    border-radius: 16px;
+    padding: 24px;
+    margin: 16px 0;
+    color: var(--basic-white);
+    font-size: 20px;
+    cursor: pointer;
+}
+

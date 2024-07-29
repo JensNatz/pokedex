@@ -1,12 +1,19 @@
 function generatePokemonCardHTML(pokemonInformation) {
-  return `<div id="card-${pokemonInformation.name}" class="pokemon-card color-${pokemonInformation.types[0]}" onclick="showPokemonDetailView(${pokemonInformation.id})">
+  return `<div id="card-${pokemonInformation.name}" 
+              class="pokemon-card color-${pokemonInformation.types[0]}" 
+              style="background-image: url(${pokemonInformation.image})"
+              onclick="showPokemonDetailView(${pokemonInformation.id})"
+          >
+            <div class="card-titlearea">
+              <h2 class="card-name">${pokemonInformation.name}</h2>
+              <span>${formatPokemonId(pokemonInformation.id)}</span>
+             </div>
             <div class="card-infoarea">
-                <h2 class="card-name">${pokemonInformation.name} ${formatPokemonId(pokemonInformation.id)}</h2>
                 <div class="card-types">
                   ${genereateTypesHTML(pokemonInformation.types)}
                 </div>
             </div>
-            <img src="${pokemonInformation.image}" alt="${pokemonInformation.name}" class="card-image">
+             
           </div>`;
 };
 
@@ -18,14 +25,14 @@ function genereateTypesHTML(types) {
   return typesHTML;
 };
 
-function genereateAbilitiesHTML(abilities) {
-  return abilities.join(', ');
-};
 
 function generateDetailsAboutHTML(i) {
   return `
       <div class="maininfo-about">
-          <table>
+          <p class="about-flavortext">
+          ${loadedPokemon[i].flavorText}
+          </p>
+          <table class="about-table">
               <tr>
                   <td>Height</td>
                   <td>${convertHeight(loadedPokemon[i].height)}</td>
@@ -36,18 +43,18 @@ function generateDetailsAboutHTML(i) {
               </tr>
               <tr>
                   <td>Abilities</td>
-                  <td>${genereateAbilitiesHTML(loadedPokemon[i].abilities)}</td>
+                  <td class="about-table-caps">${loadedPokemon[i].abilities.join(', ')}</td>
               </tr>
           </table>
           <h3>Breeding</h3>
-          <table>
+          <table class="about-table">
               <tr>
                   <td>Gender</td>
                   <td>${convertGenderRateDescription(loadedPokemon[i].genderRate)}</td>
               </tr>
               <tr>
                   <td>Egg Groups</td>
-                  <td>${loadedPokemon[i].eggGroup}</td>
+                  <td  class="about-table-caps">${loadedPokemon[i].eggGroup.join(', ')}</td>
               </tr>
           </table>                     
       </div>
@@ -55,15 +62,19 @@ function generateDetailsAboutHTML(i) {
 }
 
 function generateDetailsBaseStatsHTML(i) {
-  let table = `<table>`;
+  let table = `<table class="stats-table">`;
   for (let k = 0; k < loadedPokemon[i].stats.length; k++) {
+    let colorcode
+    if (loadedPokemon[i].stats[k][1] >= 50){
+      colorcode = "green";
+    } else { colorcode = "red"}
       table += `
           <tr>
               <td>${loadedPokemon[i].stats[k][0]}</td>
               <td>${loadedPokemon[i].stats[k][1]}</td>
               <td>
                   <div class="progress-container">
-                      <div class="progress-bar" style="width: ${loadedPokemon[i].stats[k][1]}%;"></div>
+                      <div class="progress-bar bar-color-${colorcode}" style="width: ${loadedPokemon[i].stats[k][1]}%;"></div>
                   </div>
               </td>
           </tr>
@@ -73,13 +84,26 @@ function generateDetailsBaseStatsHTML(i) {
   return table;
 }
 
+// function generateDetailsEvolutionchainHTML(i) {
+//   let container = `<div class="maininfo-evochain">`;
+//   for (let k = 0; k < loadedPokemon[i].evolutionChainIds.length; k++) {
+//         container += `<img class="evochain-image" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${loadedPokemon[i].evolutionChainIds[k]}.png">`
+//         if(k < loadedPokemon[i].evolutionChainIds.length-1){
+//           container += `<img src="./assets/img/arrow-right.png" class="evochain-arrow">`;
+//         }
+//   }
+//   container += `</div>`;
+//   return container;
+// }
+
 function generateDetailsEvolutionchainHTML(i) {
-  let container = `<div class="maininfo-container">`;
-  for (let k = 0; k < loadedPokemon[i].evolutionChainIds.length; k++) {
-        container += `<img class="evochain-image" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${loadedPokemon[i].evolutionChainIds[k]}.png">`
-        if(k < loadedPokemon[i].evolutionChainIds.length-1){
-          container += `<img src="./assets/img/arrow-right.png" class="evochain-arrow">`;
-        }
+  let container = `<div class="maininfo-evochain">`;
+  for (let k = 0; k < loadedPokemon[i].evolutionChain.length; k++) {
+        container += `<div class="evochain-entry">`
+        container += `<img class="evochain-image" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${loadedPokemon[i].evolutionChain[k][0]}.png">`;
+        container += `<div class="evochain-level"><img class="evochain-arrow" src="./assets/img/arrow_right.png" >Lvl ${loadedPokemon[i].evolutionChain[k][2]}</div>`;
+        container += `<img class="evochain-image" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${loadedPokemon[i].evolutionChain[k][1]}.png">`;
+        container += `</div>`
   }
   container += `</div>`;
   return container;

@@ -1,11 +1,11 @@
-let numberOfPokemonToLoad = 7;
+let numberOfPokemonToLoad = 151;
 let maxPokemonId = 151;
 let currentPokemonId = 0;
 let loadedPokemon = [];
 
 async function renderPokemon(){
   if(loadedPokemon.length < maxPokemonId){
-    showSpinnerOverlay();
+    toggleSpinnerOverlay();
     let limit = numberOfPokemonToLoad;
     let offset = loadedPokemon.length;
     if(loadedPokemon.length+numberOfPokemonToLoad > maxPokemonId){limit = maxPokemonId-loadedPokemon.length};
@@ -16,9 +16,10 @@ async function renderPokemon(){
       await generatePokemonInformation(pokemonData);
     }
     renderPokemonCards(offset);
-    showSpinnerOverlay();
-  }else {
-    alert("no more to load");
+    toggleSpinnerOverlay();
+    if(loadedPokemon.length >= maxPokemonId){
+      deactivateLoadButton();
+    }
   }
 }
 
@@ -40,9 +41,11 @@ async function generatePokemonInformation(pokemonData){
     height: pokemonData.height,
     abilities: getPokemonAbilityNames(pokemonData.abilities),
     stats: getPokemonStatsInformation(pokemonData.stats),
-    evolutionChainIds : await getPokemonEvolutionChainIds(pokemonData.id),
+    evolutionChain : await getPokemonEvolutionChain(pokemonData.id),
     genderRate: pokemonSpeciesInformation.gender_rate,
     eggGroup: getPokemonEggGroupNames(pokemonSpeciesInformation.egg_groups),
+    flavorText: pokemonSpeciesInformation.flavor_text_entries[0].flavor_text
+
   };
   loadedPokemon.push(pokemonInformation);
   return pokemonInformation;
@@ -91,12 +94,14 @@ function showPokemonDetailView(pokemonId){
   renderPokemonDetailView(currentPokemonId);
   renderPokemonAboutInformation(currentPokemonId);
   setDetailViewBackgroundColor();
-  showDetailsOverlay();
+  toggleDetailsOverlay();
 }
 
 function setDetailViewBackgroundColor(){
-  let background = document.getElementById('pokemon-details-bg');
-  background.className= '';
+  let background = document.getElementById('pokemon-details');
+  let classes = background.className.split(" ");
+  let filteredClasses = classes.filter(cls => !cls.startsWith("color-"));
+  background.className = filteredClasses.join(" ");
   background.classList.add(`color-${loadedPokemon[currentPokemonId-1].types[0]}`)
 }
 
@@ -128,6 +133,10 @@ function loadMorePokemon(){
   renderPokemon();
 }
 
+function deactivateLoadButton(){
+  document.getElementById('load-btn').disabled = true;
+}
+
 function searchPokemon(){
   let searchString = document.getElementById('search-input').value;
   let pokemonCards = document.getElementsByClassName('pokemon-card');
@@ -147,15 +156,29 @@ function searchPokemon(){
   }
 }
 
+function setTabnavStyle(elementId){
+  let tabs = document.querySelectorAll('.tabnavigation-tab');
+  tabs.forEach(function(tab) {
+    tab.classList.remove('tab-active');
+  });
+  document.getElementById(elementId).classList.add("tab-active"); 
+}
+
 function renderPokemonAboutInformation(){
+  event.stopPropagation();
+  setTabnavStyle('tabnav-about');
   let i = currentPokemonId-1;
   document.getElementById('maininfo-container').innerHTML = generateDetailsAboutHTML(i);
 }
 function renderPokemonBasestatsInformation(){
+  event.stopPropagation();
+  setTabnavStyle('tabnav-basestats');
   let i = currentPokemonId-1;
   document.getElementById('maininfo-container').innerHTML = generateDetailsBaseStatsHTML(i);
 }
 function renderPokemonEvolutionInformation(){
+  event.stopPropagation();
+  setTabnavStyle('tabnav-evolution');
   let i = currentPokemonId-1;
   document.getElementById('maininfo-container').innerHTML = generateDetailsEvolutionchainHTML(i);
 }
@@ -165,41 +188,46 @@ function registerEventListeners(){
   document.getElementById('tabnav-about').addEventListener("click", renderPokemonAboutInformation);
   document.getElementById('tabnav-basestats').addEventListener("click", renderPokemonBasestatsInformation);
   document.getElementById('tabnav-evolution').addEventListener("click", renderPokemonEvolutionInformation);
-  document.getElementById('detail-overlay').addEventListener("click", showDetailsOverlay);
+  document.getElementById('overlay-close').addEventListener("click", toggleDetailsOverlay);
   document.getElementById('search-input').addEventListener("input", searchPokemon); 
 }
 
-function showDetailsOverlay() {
-  document.getElementById('detail-overlay').classList.add('detail-overlay-show');
+function toggleDetailsOverlay() {
+  document.getElementById('detail-overlay').classList.toggle('detail-overlay-show');
 }
 
-function showSpinnerOverlay() {
+function toggleSpinnerOverlay() {
   document.getElementById('spinner-overlay').classList.toggle('d-none');
 }
 
-async function getPokemonEvolutionChainIds(pokemonId) {
-  let speciesData =  await loadFromApi(API_BASE_URL+"pokemon-species/"+pokemonId);
+async function getPokemonEvolutionChain(pokemonId) {
+  let speciesData =  await loadFromApi(API_BASE_URL + "pokemon-species/" + pokemonId);
   let evolutionChainUrl = speciesData.evolution_chain.url;
   let evolutionChainData = await loadFromApi(evolutionChainUrl);
-  let evolutionIds = [];
-  function extractIds(evolutionNode) {
+  let chain = [];
+  function extractChain(evolutionNode) {
       let urlParts = evolutionNode.species.url.split('/');
-      let id = urlParts[urlParts.length - 2];
-      evolutionIds.push(parseInt(id));
-      if (evolutionNode.evolves_to.length > 0) {
-          evolutionNode.evolves_to.forEach(evolveNode => extractIds(evolveNode));
-      }
+      let currentId = parseInt(urlParts[urlParts.length - 2]);
+      evolutionNode.evolves_to.forEach(evolveNode => {
+          let evolveUrlParts = evolveNode.species.url.split('/');
+          let nextId = parseInt(evolveUrlParts[evolveUrlParts.length - 2]);
+          let minLevel = null;
+          if (evolveNode.evolution_details.length > 0) {
+              minLevel = evolveNode.evolution_details[0].min_level;
+          }
+          chain.push([currentId, nextId, minLevel]);
+          extractChain(evolveNode);
+      });
   }
-  extractIds(evolutionChainData.chain);
-  return evolutionIds;
+  extractChain(evolutionChainData.chain);
+  return chain;
 }
 
 function init(){ 
  renderPokemon();
  registerEventListeners();
 }
+
 window.addEventListener("load", init);
 
-//TO DO -
-// Meldung wenn alle pokemon geladen sind oder button deaktivieren 
-// Style der Balken in 3 Farben, rot, grün gelb
+// TO DO: wenn evolution chain 0 groß ist, dann soll da einfach "none stehen"

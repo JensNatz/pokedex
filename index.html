@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="styles/reset.css">
+    <link rel="stylesheet" href="styles/fonts.css">
     <link rel="stylesheet" href="styles/spinner.css">
     <link rel="stylesheet" href="styles/style.css">
     <link rel="stylesheet" href="styles/colors.css">
@@ -16,39 +17,40 @@
 
 <body>
     <header>
-        <input type="text" id="search-input">
+        <div class="header-bar">
+            <input type="text" id="search-input">
+        </div>
     </header>
     <div id="pokedex-container" class="pokedex-container">
 
     </div>
-    <button id="load-btn">load more</button>
-    <div id="detail-overlay" class="detail-overlay">
-       
-            <img src="./assets/img/arrow-left.png" onclick="loadNextPokemonDetailView(event, -1)">
+    <div class="loadbtn-container">
+        <button id="load-btn" class="load-btn">Load more</button>
+    </div>
+    <div id="detail-overlay" class="detail-overlay background-blur">
+            <img class="overlay-arrow" src="./assets/img/arrow_back.png" onclick="loadNextPokemonDetailView(event, -1)">
             <div id="pokemon-details" class="pokemon-details">
-                <div id="pokemon-details-bg">
-                    <div class="detais-baseinfo">
+                    <div class="details-baseinfo">
                         <div class="baseinfo-specs">
-                            <h2 id="baseinfo-name" class="baseinfo-name"></h2>
-                            <div id="baseinfo-types" class="baseinfo-types">
-                            </div>
+                            <h2 id="baseinfo-name" class="card-name"></h2>
+                            <div id="baseinfo-id" class="baseinfo-id"></div>
+                            <div id="baseinfo-types" class="baseinfo-types"></div>
                         </div>
-                        <div id="baseinfo-id" class="baseinfo-id">
-                        </div>
+                        <img id="overlay-close" class="overlay-close" src="./assets/img/close.png">
                     </div>
-                    <img id="baseinfo-image" class="details-image">
-                    <div class="details-maininfo">
-                        <ul class="maininfo-tabnavigation">
-                            <li class="tabnavigation-tab" id="tabnav-about">About</li>
-                            <li class="tabnavigation-tab" id="tabnav-basestats">Base Stats</li>
-                            <li class="tabnavigation-tab" id="tabnav-evolution">Evolution</li>
-                        </ul>
+                        <img id="baseinfo-image" class="details-image">
+                        <div class="details-maininfo">
+                            <ul class="maininfo-tabnavigation">
+                                <li class="tabnavigation-tab tab-active" id="tabnav-about">About</li>
+                                <li class="tabnavigation-tab" id="tabnav-basestats">Base Stats</li>
+                                <li class="tabnavigation-tab" id="tabnav-evolution">Evolution</li>
+                            </ul>
                         <div id="maininfo-container" class="maininfo-container">
                         </div>
                     </div>
-                </div>
+                    
             </div>
-            <img src="./assets/img/arrow-right.png" onclick="loadNextPokemonDetailView(event, 1)">
+            <img class="overlay-arrow" src="./assets/img/arrow_forward.png" onclick="loadNextPokemonDetailView(event, 1)">
     </div>
     <div class="spinner-overlay background-blur d-none" id="spinner-overlay">
         <div class="ball"></div>
@@ -57,5 +59,4 @@
     <footer>
     </footer>
 </body>
-
 </html>
