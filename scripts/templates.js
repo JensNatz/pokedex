@@ -6,7 +6,7 @@ function generatePokemonCardHTML(pokemonInformation) {
           >
             <div class="card-titlearea">
               <h2 class="card-name">${pokemonInformation.name}</h2>
-              <span>${formatPokemonId(pokemonInformation.id)}</span>
+              <span class="card-id">${formatPokemonId(pokemonInformation.id)}</span>
              </div>
             <div class="card-infoarea">
                 <div class="card-types">
@@ -84,27 +84,25 @@ function generateDetailsBaseStatsHTML(i) {
   return table;
 }
 
-// function generateDetailsEvolutionchainHTML(i) {
-//   let container = `<div class="maininfo-evochain">`;
-//   for (let k = 0; k < loadedPokemon[i].evolutionChainIds.length; k++) {
-//         container += `<img class="evochain-image" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${loadedPokemon[i].evolutionChainIds[k]}.png">`
-//         if(k < loadedPokemon[i].evolutionChainIds.length-1){
-//           container += `<img src="./assets/img/arrow-right.png" class="evochain-arrow">`;
-//         }
-//   }
-//   container += `</div>`;
-//   return container;
-// }
-
 function generateDetailsEvolutionchainHTML(i) {
   let container = `<div class="maininfo-evochain">`;
-  for (let k = 0; k < loadedPokemon[i].evolutionChain.length; k++) {
-        container += `<div class="evochain-entry">`
-        container += `<img class="evochain-image" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${loadedPokemon[i].evolutionChain[k][0]}.png">`;
-        container += `<div class="evochain-level"><img class="evochain-arrow" src="./assets/img/arrow_right.png" >Lvl ${loadedPokemon[i].evolutionChain[k][2]}</div>`;
-        container += `<img class="evochain-image" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${loadedPokemon[i].evolutionChain[k][1]}.png">`;
-        container += `</div>`
+  if(loadedPokemon[i].evolutionChain.length > 0){
+    for (let k = 0; k < loadedPokemon[i].evolutionChain.length; k++) {
+      container += `<div class="evochain-entry">`
+      container += `<img class="evochain-image" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${loadedPokemon[i].evolutionChain[k][0]}.png">`;
+      container += `<div class="evochain-level">
+                    <img class="evochain-arrow" src="./assets/img/arrow_right.png" >`;
+      if(loadedPokemon[i].evolutionChain[k][2] != null){
+        container += `Lvl ${loadedPokemon[i].evolutionChain[k][2]}`;
+      }
+      container += `</div>`;
+      container += `<img class="evochain-image" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${loadedPokemon[i].evolutionChain[k][1]}.png">`;
+      container += `</div>`
+    }
+  }else {
+    container += `This Pokémon does not evolve.`;
   }
+
   container += `</div>`;
   return container;
 }

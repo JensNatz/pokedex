@@ -4,6 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" sizes="32x32" href="./assets/img/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="./assets/img/favicon-16x16.png">
     <link rel="stylesheet" href="styles/reset.css">
     <link rel="stylesheet" href="styles/fonts.css">
     <link rel="stylesheet" href="styles/spinner.css">
@@ -17,18 +19,23 @@
 
 <body>
     <header>
-        <div class="header-bar">
-            <input type="text" id="search-input">
+        <div class="header-container">
+            <div class="logo">
+                <img class="logo-img" src="./assets/img/logo.png" alt="Pokédex Logo">
+                <h1>Pokédex</h1>
+            </div>
+            <input type="text" id="search-input" class="search-input" placeholder="Search Pokémon by name...">
         </div>
     </header>
-    <div id="pokedex-container" class="pokedex-container">
-
+    <div class="pokedex-wrapper">
+        <div id="pokedex-container" class="pokedex-container"></div>
+    </div>
     </div>
     <div class="loadbtn-container">
         <button id="load-btn" class="load-btn">Load more</button>
     </div>
     <div id="detail-overlay" class="detail-overlay background-blur">
-            <img class="overlay-arrow" src="./assets/img/arrow_back.png" onclick="loadNextPokemonDetailView(event, -1)">
+            <img class="overlay-arrow overlay-arrow-full" src="./assets/img/arrow_back.png" onclick="loadNextPokemonDetailView(event, -1)">
             <div id="pokemon-details" class="pokemon-details">
                     <div class="details-baseinfo">
                         <div class="baseinfo-specs">
@@ -38,7 +45,11 @@
                         </div>
                         <img id="overlay-close" class="overlay-close" src="./assets/img/close.png">
                     </div>
-                        <img id="baseinfo-image" class="details-image">
+                        <div class="overlay-image-container">
+                            <img class="overlay-arrow overlay-arrow-mobile" src="./assets/img/arrow_back.png" onclick="loadNextPokemonDetailView(event, -1)">
+                            <img id="baseinfo-image" class="details-image">
+                            <img class="overlay-arrow overlay-arrow-mobile" src="./assets/img/arrow_forward.png" onclick="loadNextPokemonDetailView(event, 1)">
+                        </div>
                         <div class="details-maininfo">
                             <ul class="maininfo-tabnavigation">
                                 <li class="tabnavigation-tab tab-active" id="tabnav-about">About</li>
@@ -50,7 +61,7 @@
                     </div>
                     
             </div>
-            <img class="overlay-arrow" src="./assets/img/arrow_forward.png" onclick="loadNextPokemonDetailView(event, 1)">
+            <img class="overlay-arrow overlay-arrow-full" src="./assets/img/arrow_forward.png" onclick="loadNextPokemonDetailView(event, 1)">
     </div>
     <div class="spinner-overlay background-blur d-none" id="spinner-overlay">
         <div class="ball"></div>

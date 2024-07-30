@@ -1,4 +1,4 @@
-let numberOfPokemonToLoad = 151;
+let numberOfPokemonToLoad = 20;
 let maxPokemonId = 151;
 let currentPokemonId = 0;
 let loadedPokemon = [];
@@ -14,20 +14,20 @@ async function renderPokemon(){
     for (let i = 0; i < currentPokemons.results.length; i++) {
       let pokemonData = await loadFromApi(currentPokemons.results[i].url);
       await generatePokemonInformation(pokemonData);
-    }
+    };
     renderPokemonCards(offset);
     toggleSpinnerOverlay();
     if(loadedPokemon.length >= maxPokemonId){
       deactivateLoadButton();
-    }
-  }
+    };
+  };
 }
 
 function renderPokemonCards(offset){
   for (let i = offset; i < loadedPokemon.length; i++) {
     let pokemonCardHTML = generatePokemonCardHTML(loadedPokemon[i]);
     document.getElementById('pokedex-container').innerHTML += pokemonCardHTML;
-  }
+  };
 }
 
 async function generatePokemonInformation(pokemonData){
@@ -45,7 +45,6 @@ async function generatePokemonInformation(pokemonData){
     genderRate: pokemonSpeciesInformation.gender_rate,
     eggGroup: getPokemonEggGroupNames(pokemonSpeciesInformation.egg_groups),
     flavorText: pokemonSpeciesInformation.flavor_text_entries[0].flavor_text
-
   };
   loadedPokemon.push(pokemonInformation);
   return pokemonInformation;
@@ -69,7 +68,7 @@ function getPokemonStatsInformation(stats){
   for (let i = 0; i < stats.length; i++) {
     let arrStat = [stats[i].stat.name, stats[i].base_stat];
     arrStats.push(arrStat); 
-  }
+  };
   return arrStats;
 }
 
@@ -102,7 +101,7 @@ function setDetailViewBackgroundColor(){
   let classes = background.className.split(" ");
   let filteredClasses = classes.filter(cls => !cls.startsWith("color-"));
   background.className = filteredClasses.join(" ");
-  background.classList.add(`color-${loadedPokemon[currentPokemonId-1].types[0]}`)
+  background.classList.add(`color-${loadedPokemon[currentPokemonId-1].types[0]}`);
 }
 
 function renderPokemonDetailView(pokemonId){
@@ -111,7 +110,7 @@ function renderPokemonDetailView(pokemonId){
   document.getElementById('baseinfo-image').src = loadedPokemon[i].image;
   document.getElementById('baseinfo-id').innerHTML = formatPokemonId(pokemonId);
   document.getElementById('baseinfo-types').innerHTML = genereateTypesHTML(loadedPokemon[i].types);
-};
+}
 
 async function loadNextPokemonDetailView(event, step){
   event.stopPropagation();
@@ -122,7 +121,7 @@ async function loadNextPokemonDetailView(event, step){
     nextId = loadedPokemon.length;
   } else {
     nextId = currentPokemonId+step;
-  }
+  };
   currentPokemonId = nextId;
   renderPokemonDetailView(nextId);
   renderPokemonAboutInformation();
@@ -131,6 +130,7 @@ async function loadNextPokemonDetailView(event, step){
 
 function loadMorePokemon(){
   renderPokemon();
+  showAllCards();
 }
 
 function deactivateLoadButton(){
@@ -143,17 +143,17 @@ function searchPokemon(){
   if(searchString.length > 2){
     for (let card of pokemonCards) {
       if(card.id.substring(5).includes(searchString.toLowerCase())){
-        card.style.display = "flex"
+        card.classList.remove("d-none");
       }
       else {
-         card.style.display = "none"
-      }
-    }
+        card.classList.add("d-none");
+      };
+    };
   } else {
     for (let card of pokemonCards) {
-        card.style.display = "flex"
-    }
-  }
+      card.classList.remove("d-none");
+    };
+  };
 }
 
 function setTabnavStyle(elementId){
@@ -165,19 +165,18 @@ function setTabnavStyle(elementId){
 }
 
 function renderPokemonAboutInformation(){
-  event.stopPropagation();
   setTabnavStyle('tabnav-about');
   let i = currentPokemonId-1;
   document.getElementById('maininfo-container').innerHTML = generateDetailsAboutHTML(i);
 }
+
 function renderPokemonBasestatsInformation(){
-  event.stopPropagation();
   setTabnavStyle('tabnav-basestats');
   let i = currentPokemonId-1;
   document.getElementById('maininfo-container').innerHTML = generateDetailsBaseStatsHTML(i);
 }
+
 function renderPokemonEvolutionInformation(){
-  event.stopPropagation();
   setTabnavStyle('tabnav-evolution');
   let i = currentPokemonId-1;
   document.getElementById('maininfo-container').innerHTML = generateDetailsEvolutionchainHTML(i);
@@ -194,10 +193,18 @@ function registerEventListeners(){
 
 function toggleDetailsOverlay() {
   document.getElementById('detail-overlay').classList.toggle('detail-overlay-show');
+  document.body.classList.toggle('prevent-scrolling');
 }
 
 function toggleSpinnerOverlay() {
   document.getElementById('spinner-overlay').classList.toggle('d-none');
+}
+
+function showAllCards() {
+  let pokemonCards = document.getElementsByClassName('pokemon-card');
+  for (let card of pokemonCards) {
+      card.classList.remove("d-none");
+  };
 }
 
 async function getPokemonEvolutionChain(pokemonId) {
@@ -214,11 +221,11 @@ async function getPokemonEvolutionChain(pokemonId) {
           let minLevel = null;
           if (evolveNode.evolution_details.length > 0) {
               minLevel = evolveNode.evolution_details[0].min_level;
-          }
+          };
           chain.push([currentId, nextId, minLevel]);
           extractChain(evolveNode);
       });
-  }
+  };
   extractChain(evolutionChainData.chain);
   return chain;
 }
@@ -229,5 +236,3 @@ function init(){
 }
 
 window.addEventListener("load", init);
-
-// TO DO: wenn evolution chain 0 groß ist, dann soll da einfach "none stehen"
